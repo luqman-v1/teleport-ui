@@ -11,6 +11,7 @@ Made with ❤️ by **Luqi** • Open Sourced for **Stockbit**
 * **Interactive Terminal Capture (PTY)**: Dynamically inject SSO passwords and OTP (2FA) inputs directly through beautiful UI modals rather than typing in the console.
 * **Dynamic Configuration Data**: Your databases layout and application configurations are automatically persisted securely into local JSON files.
 * **Native Cross-Platform**: Compile the tool into highly portable binary executables for macOS, Linux, and Windows Native via the Makefile.
+* **PWA Support**: Installable as a standalone desktop app via Progressive Web App (PWA) — no Electron, no wrapper, just open in Chrome/Edge and install directly to your dock or taskbar.
 
 ## 🛑 Cons / Limitations
 * **Terminal Dependent Output**: Due to capturing stdout via PTY, it does not currently launch external browser hooks natively for SAML auth directly inside the Teleport CLI flow—it heavily depends on intercepts of pure terminal user/password prompts.
@@ -22,6 +23,27 @@ Made with ❤️ by **Luqi** • Open Sourced for **Stockbit**
 Before you begin, ensure you have the following installed on your machine:
 1. **[Go 1.26+](https://go.dev/doc/install)** (For compiling or running the tool locally).
 2. **[Teleport CLI (`tsh`)](https://goteleport.com/download/)** configured and working previously to interface with your cluster infrastructure.
+
+---
+
+## 📸 Screenshots
+
+> **Main Interface** — Dashboard utama TeleDB Proxy dengan daftar koneksi database di sidebar kiri dan panel koneksi di tengah.
+
+![TeleDB Proxy UI](ss.png)
+
+---
+
+## 📱 PWA Installation
+
+Teleport DB Proxy UI supports **Progressive Web App (PWA)** — you can install it as a standalone desktop application without any additional software.
+
+**To install on macOS (Chrome / Edge):**
+1. Open the app in your browser at `http://localhost:8080`.
+2. Click the **install icon** (⊕) in the browser's address bar, or go to **Menu → Install Teleport DB Proxy**.
+3. The app will launch as a native-like window — pinnable to your Dock or Taskbar.
+
+> **Note**: PWA installation requires the server to be running locally. The app works fully offline for the UI, but active proxy sessions still require a live server process.
 
 ---
 
