@@ -36,6 +36,13 @@ make run
 ```
 *Note: A tab in your default Web Browser will be auto-generated for you as soon as the web server binds!*
 
+By default, the application runs on port `8080`. To launch it on a custom port, run the binary or Go tool directly with the `--port` flag:
+```bash
+go run cmd/teleport-ui/main.go --port 9090
+# or if executed from compiled binaries:
+./bin/teleport-ui-darwin-arm64 --port 9090
+```
+
 To build static, cross-platform executable binaries directly into the `bin/` directory:
 ```bash
 make build-all
