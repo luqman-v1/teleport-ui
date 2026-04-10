@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleport Database Interface</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <h2><span class="icon">🔌</span> TeleDB Proxy</h2>
+                <button id="addDbBtn" class="btn btn-sm btn-outline">+ Add New</button>
+            </div>
+
+            <div class="db-list" id="dbList">
+                <!-- Dynamically populated -->
+            </div>
+
+            <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--border-glass);">
+                <button id="settingsBtn" class="btn btn-block btn-outline">⚙️ Global Settings</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="welcomeScreen" class="screen active">
+                <div class="welcome-center">
+                    <div class="pulse-ring"></div>
+                    <h2>Select a Database to Connect</h2>
+                    <p>Choose an instance from the left sidebar or add a new configuration.</p>
+                </div>
+            </div>
+
+            <div id="connectScreen" class="screen glass-panel">
+                <div class="connect-header">
+                    <h2 id="selectedDbTitle">Database Name</h2>
+                    <span class="badge" id="selectedDbInstance">db-instance</span>
+                </div>
+
+                <form id="connectForm" class="connect-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Access Type</label>
+                            <select id="accessType">
+                                <option value="read">Read (telereader)</option>
+                                <option value="write">Write (telewriter)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Provider</label>
+                            <select id="provider">
+                                <option value="aws">AWS (Amazon Web Services)</option>
+                                <option value="gcp">GCP (Google Cloud Platform)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Local Port</label>
+                        <input type="number" id="localPort" value="6666" placeholder="e.g. 6666">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="startBtn">Launch Proxy
+                        Connection</button>
+                    <button type="button" class="btn btn-danger btn-block hidden" id="stopBtn">Disconnect Proxy</button>
+                </form>
+
+                <div class="terminal-container">
+                    <div class="terminal-header">Logs & Terminal</div>
+
+                    <!-- Interactive Input Overlay (Shows up when Password/OTP is requested) -->
+                    <div class="terminal-input-overlay" id="inputOverlay">
+                        <div class="input-card">
+                            <h3 id="inputPromptLabel">Action Required</h3>
+                            <input type="password" id="terminalInput" autocomplete="off"
+                                placeholder="Enter input here...">
+                            <button class="btn btn-primary" id="submitInputBtn">Submit / Enter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Credit -->
+            <div
+                style="text-align: center; font-size: 0.8rem; color: var(--text-muted); opacity: 0.8; margin-top: auto; padding-top: 10px; padding-bottom: 5px;">
+                Made with ❤️ by <strong>Luqi</strong> &bull; Open Sourced for <a href="https://stockbit.com"
+                    target="_blank"
+                    style="color: var(--primary); text-decoration: none; font-weight: bold;">Stockbit</a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add DB Modal -->
+    <div class="modal-backdrop" id="addDbModal">
+        <div class="modal glass-panel">
+            <h2>Add Database Instance</h2>
+            <form id="addDbForm">
+                <div class="form-group">
+                    <label>Label</label>
+                    <input type="text" id="newLabel" placeholder="e.g. Prod Core" required>
+                </div>
+                <div class="form-group">
+                    <label>Database Name</label>
+                    <input type="text" id="newDbName" placeholder="e.g. sb-prod-db" required>
+                </div>
+                <div class="form-group">
+                    <label>Teleport Instance Name</label>
+                    <input type="text" id="newDbInstance" placeholder="e.g. sb-rds-cluster" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="closeModalBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Database</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-backdrop" id="settingsModal">
+        <div class="modal glass-panel">
+            <h2>Global Settings</h2>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>Teleport Proxy Host</label>
+                    <input type="text" id="teleportProxy" required>
+                </div>
+                <div class="form-group">
+                    <label>Teleport Username</label>
+                    <input type="email" id="teleportUser" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="closeSettingsBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

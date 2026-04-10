@@ -1,0 +1,9 @@
+# Binary files
+bin/
+teleport-ui
+teleport-ui-*
+*.exe
+
+# Application data
+config.json
+databases.json
