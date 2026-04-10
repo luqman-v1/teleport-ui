@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"teleport-ui/internal/models"
 	"teleport-ui/internal/store"
+	"teleport-ui/web"
 
 	"golang.org/x/net/websocket"
 )
@@ -19,7 +20,7 @@ func NewServer(s *store.DataStore) *Server {
 }
 
 func (srv *Server) RegisterRoutes(mux *http.ServeMux) {
-	mux.Handle("/", http.FileServer(http.Dir("./web")))
+	mux.Handle("/", http.FileServer(http.FS(web.Assets)))
 	mux.HandleFunc("/api/databases", srv.handleDatabases)
 	mux.HandleFunc("/api/config", srv.handleConfig)
 	mux.Handle("/api/connect", websocket.Handler(srv.handleConnectWS))

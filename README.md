@@ -27,7 +27,7 @@ Before you begin, ensure you have the following installed on your machine:
 
 ## 🚀 Getting Started
 
-### 1. Run The App
+### 1. Run via Source Code
 Clone this repository and easily handle everything using `make`.
 
 To run the application immediately in local-development mode:
@@ -39,13 +39,20 @@ make run
 By default, the application runs on port `8080`. To launch it on a custom port, run the binary or Go tool directly with the `--port` flag:
 ```bash
 go run cmd/teleport-ui/main.go --port 9090
-# or if executed from compiled binaries:
-./bin/teleport-ui-darwin-arm64 --port 9090
 ```
 
 To build static, cross-platform executable binaries directly into the `bin/` directory:
 ```bash
 make build-all
+```
+
+### 1.5. Run Compiled Downloads (Releases)
+If you downloaded the compiled binary from the **Releases** page (e.g., for Mac or Linux), your Operating System will likely remove its execution permissions for security purposes. You must grant it executable rights before launching:
+
+```bash
+# Example for Mac Apple Silicon (M1/M2)
+chmod +x ~/Downloads/teleport-ui-darwin-arm64
+~/Downloads/teleport-ui-darwin-arm64 --port 8080
 ```
 
 ### 2. Define Configurations
