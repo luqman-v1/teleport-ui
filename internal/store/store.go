@@ -39,15 +39,16 @@ func (s *DataStore) GetDatabases() ([]models.Database, error) {
 
 	b, err := os.ReadFile(s.dbPath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return []models.Database{}, nil
-		}
-		return nil, err
+		return []models.Database{}, nil // Fallback safe
 	}
 
-	var dbs []models.Database
+	if len(b) == 0 {
+		return []models.Database{}, nil
+	}
+
+	dbs := []models.Database{} // Strongly typed empty allocation guarantees [] instead of null in JSON
 	if err := json.Unmarshal(b, &dbs); err != nil {
-		return nil, err
+		return []models.Database{}, nil // Treat as empty if corrupted
 	}
 	return dbs, nil
 }
@@ -81,7 +82,7 @@ func (s *DataStore) DeleteDatabase(id string) error {
 		_ = json.Unmarshal(b, &dbs)
 	}
 
-	var updated []models.Database
+	updated := []models.Database{}
 	for _, db := range dbs {
 		if db.ID != id {
 			updated = append(updated, db)
@@ -101,15 +102,12 @@ func (s *DataStore) GetConfig() (models.GlobalConfig, error) {
 
 	var cfg models.GlobalConfig
 	b, err := os.ReadFile(s.configPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return models.GlobalConfig{TeleportProxy: ""}, nil
-		}
-		return cfg, err
+	if err != nil || len(b) == 0 {
+		return models.GlobalConfig{TeleportProxy: ""}, nil
 	}
 
 	if err := json.Unmarshal(b, &cfg); err != nil {
-		return cfg, err
+		return models.GlobalConfig{TeleportProxy: ""}, nil
 	}
 
 	return cfg, nil
