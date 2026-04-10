@@ -1,7 +1,7 @@
 # Binary files
 bin/
-teleport-ui
-teleport-ui-*
+/teleport-ui
+/teleport-ui-*
 *.exe
 
 # Application data
