@@ -4,8 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teleport Database Interface</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>TeleDB Proxy</title>
+    <meta name="description" content="Teleport Database Proxy UI — Connect to your databases securely via Teleport.">
+    <meta name="theme-color" content="#3b82f6">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- iOS / macOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TeleDB">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+    <!-- Windows PWA Support -->
+    <meta name="msapplication-TileColor" content="#0b0d12">
+    <meta name="msapplication-TileImage" content="/icons/icon-192.png">
+
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -74,7 +92,7 @@
                 </form>
 
                 <div class="terminal-container">
-                    <div class="terminal-header">Logs & Terminal</div>
+                    <div class="terminal-header">Logs &amp; Terminal</div>
 
                     <!-- Interactive Input Overlay (Shows up when Password/OTP is requested) -->
                     <div class="terminal-input-overlay" id="inputOverlay">
@@ -94,6 +112,9 @@
                 Made with ❤️ by <strong>Luqi</strong> &bull; Open Sourced for <a href="https://stockbit.com"
                     target="_blank"
                     style="color: var(--primary); text-decoration: none; font-weight: bold;">Stockbit</a>
+                &bull; <a href="https://github.com/luqman-v1/teleport-ui"
+                    target="_blank"
+                    style="color: var(--primary); text-decoration: none; font-weight: bold;">GitHub</a>
             </div>
         </main>
     </div>
@@ -145,6 +166,21 @@
     </div>
 
     <script src="script.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(reg => {
+                        console.log('[PWA] Service Worker registered. Scope:', reg.scope);
+                    })
+                    .catch(err => {
+                        console.warn('[PWA] Service Worker registration failed:', err);
+                    });
+            });
+        }
+    </script>
 </body>
 
 </html>

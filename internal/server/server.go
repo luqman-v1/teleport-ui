@@ -20,7 +20,26 @@ func NewServer(s *store.DataStore) *Server {
 }
 
 func (srv *Server) RegisterRoutes(mux *http.ServeMux) {
-	mux.Handle("/", http.FileServer(http.FS(web.Assets)))
+	fileServer := http.FileServer(http.FS(web.Assets))
+
+	// Serve sw.js at root scope with required Service-Worker-Allowed header
+	mux.HandleFunc("/sw.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		w.Header().Set("Service-Worker-Allowed", "/")
+		w.Header().Set("Cache-Control", "no-cache")
+		fileServer.ServeHTTP(w, r)
+	})
+
+	// Serve manifest.json with correct MIME type for PWA
+	mux.HandleFunc("/manifest.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/manifest+json")
+		fileServer.ServeHTTP(w, r)
+	})
+
+	// Serve PWA icons
+	mux.Handle("/icons/", fileServer)
+
+	mux.Handle("/", fileServer)
 	mux.HandleFunc("/api/databases", srv.handleDatabases)
 	mux.HandleFunc("/api/config", srv.handleConfig)
 	mux.Handle("/api/connect", websocket.Handler(srv.handleConnectWS))

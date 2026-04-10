@@ -306,11 +306,12 @@ input:focus, select:focus {
     flex: 1;
     padding: 16px;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.85rem;
-    color: #a3e635; /* Terminal green */
+    font-size: 0.92rem;
+    color: #ccff88; /* Brighter terminal green */
     overflow-y: auto;
     white-space: pre-wrap;
-    line-height: 1.5;
+    line-height: 1.6;
+    text-shadow: 0 0 8px rgba(180, 255, 100, 0.25);
 }
 
 .terminal-output::-webkit-scrollbar { width: 6px; }
