@@ -1,7 +1,7 @@
 .PHONY: build run test clean build-all
 
 APP_NAME=teleport-ui
-MAIN_PATH=cmd/teleport-ui/main.go
+MAIN_PATH=./cmd/teleport-ui/main.go
 BUILD_DIR=bin
 
 # Uses the local go binary
