@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"teleport-ui/internal/server"
 	"teleport-ui/internal/store"
@@ -32,8 +34,31 @@ func main() {
 	portFlag := flag.String("port", "8080", "Port to run the web server on")
 	flag.Parse()
 
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Could not find user home directory: %v", err)
+	}
+
+	appDir := filepath.Join(homeDir, ".teleport-ui")
+	dbPath := filepath.Join(appDir, "databases.json")
+	configPath := filepath.Join(appDir, "config.json")
+
+	// Migration logic: copy existing files from current working directory if available
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		if b, err := os.ReadFile("databases.json"); err == nil {
+			os.MkdirAll(appDir, 0755)
+			os.WriteFile(dbPath, b, 0644)
+		}
+	}
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		if b, err := os.ReadFile("config.json"); err == nil {
+			os.MkdirAll(appDir, 0755)
+			os.WriteFile(configPath, b, 0644)
+		}
+	}
+
 	// Initialize the file-based persistent store
-	s := store.NewDataStore("databases.json", "config.json")
+	s := store.NewDataStore(dbPath, configPath)
 	
 	// Inject the store into the HTTP Server
 	srv := server.NewServer(s)

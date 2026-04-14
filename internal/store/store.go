@@ -3,6 +3,7 @@ package store
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"sync"
 	"teleport-ui/internal/models"
 )
@@ -17,11 +18,13 @@ type DataStore struct {
 func NewDataStore(dbPath, configPath string) *DataStore {
 	// Initialize default databases.json if not exist
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		_ = os.MkdirAll(filepath.Dir(dbPath), 0755)
 		_ = os.WriteFile(dbPath, []byte("[]\n"), 0644)
 	}
 
 	// Initialize default config.json if not exist
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		_ = os.MkdirAll(filepath.Dir(configPath), 0755)
 		cfg := models.GlobalConfig{TeleportProxy: ""}
 		out, _ := json.MarshalIndent(cfg, "", "  ")
 		_ = os.WriteFile(configPath, out, 0644)
