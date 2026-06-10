@@ -1,98 +1,73 @@
-# Teleport DB Proxy UI
+# TeleDB Proxy
 
-Teleport DB Proxy UI is a modern, lightweight web-based interface for managing Teleport database connections. Built entirely in Go, it eliminates the need to run repetitive `tsh` proxy terminal commands and simplifies multi-database access into an elegant centralized hub.
+A desktop application for connecting to databases via [Teleport](https://goteleport.com/) without dealing with command-line flags. Built with **Tauri v2** (Rust backend + Vite frontend).
 
-Made with ❤️ by **Luqi** • Open Sourced for **Stockbit**
+![TeleDB Proxy Screenshot](ss.png)
 
----
+## Features
 
-## 🌟 Pros / Capabilities
-* **Multi-session Proxying**: Keep multiple background database connections alive concurrently across different local ports without opening dozen terminal tabs.
-* **Interactive Terminal Capture (PTY)**: Dynamically inject SSO passwords and OTP (2FA) inputs directly through beautiful UI modals rather than typing in the console.
-* **Dynamic Configuration Data**: Your databases layout and application configurations are automatically persisted securely into local JSON files.
-* **Native Cross-Platform**: Compile the tool into highly portable binary executables for macOS, Linux, and Windows Native via the Makefile.
-* **PWA Support**: Installable as a standalone desktop app via Progressive Web App (PWA) — no Electron, no wrapper, just open in Chrome/Edge and install directly to your dock or taskbar.
+- **Database Management** — Add, edit, and delete database configurations
+- **One-Click Proxy** — Launch `tsh proxy db` sessions with a single click
+- **Interactive Terminal** — View live output with automatic password/OTP prompts
+- **Multiple Sessions** — Run multiple proxy sessions simultaneously
+- **Global Settings** — Configure Teleport proxy host and username once
 
-## 🛑 Cons / Limitations
-* **Terminal Dependent Output**: Due to capturing stdout via PTY, it does not currently launch external browser hooks natively for SAML auth directly inside the Teleport CLI flow—it heavily depends on intercepts of pure terminal user/password prompts.
-* **Tethered Processes**: When the primary Teleport UI web-server daemon is killed/stopped in the terminal, all tunneled background connections die permanently with it. There's no detached background-service handling capability quite yet.
+## Prerequisites
 
----
+- [Rust](https://www.rust-lang.org/tools/install) (stable)
+- [Node.js](https://nodejs.org/) (v18+)
+- Teleport CLI (`tsh`) installed and in PATH
 
-## 📋 Prerequisites
-Before you begin, ensure you have the following installed on your machine:
-1. **[Go 1.26+](https://go.dev/doc/install)** (For compiling or running the tool locally).
-2. **[Teleport CLI (`tsh`)](https://goteleport.com/download/)** configured and working previously to interface with your cluster infrastructure.
-
----
-
-## 📸 Screenshots
-
-> **Main Interface** — Dashboard utama TeleDB Proxy dengan daftar koneksi database di sidebar kiri dan panel koneksi di tengah.
-
-![TeleDB Proxy UI](ss.png)
-
----
-
-## 📱 PWA Installation
-
-Teleport DB Proxy UI supports **Progressive Web App (PWA)** — you can install it as a standalone desktop application without any additional software.
-
-**To install on macOS (Chrome / Edge):**
-1. Open the app in your browser at `http://localhost:8080`.
-2. Click the **install icon** (⊕) in the browser's address bar, or go to **Menu → Install Teleport DB Proxy**.
-3. The app will launch as a native-like window — pinnable to your Dock or Taskbar.
-
-> **Note**: PWA installation requires the server to be running locally. The app works fully offline for the UI, but active proxy sessions still require a live server process.
-
----
-
-## 🚀 Getting Started
-
-### 1. Run via Source Code
-Clone this repository and easily handle everything using `make`.
-
-To run the application immediately in local-development mode:
-```bash
-make run
-```
-*Note: A tab in your default Web Browser will be auto-generated for you as soon as the web server binds!*
-
-By default, the application runs on port `8080`. To launch it on a custom port, run the binary or Go tool directly with the `--port` flag:
-```bash
-go run cmd/teleport-ui/main.go --port 9090
-```
-
-To build static, cross-platform executable binaries directly into the `bin/` directory:
-```bash
-make build-all
-```
-
-### 1.5. Run Compiled Downloads (Releases)
-If you downloaded the compiled binary from the **Releases** page (e.g., for Mac or Linux), your Operating System will likely remove its execution permissions for security purposes. You must grant it executable rights before launching:
+## Development
 
 ```bash
-# Example for Mac Apple Silicon (M1/M2)
-chmod +x ~/Downloads/teleport-ui-darwin-arm64
-~/Downloads/teleport-ui-darwin-arm64 --port 8080
+# Install Node dependencies
+npm install
+
+# Run the Tauri app in development mode
+npm run tauri dev
 ```
 
-### 2. Define Configurations
-Once the application interface is visible on your browser (default runs at `http://localhost:8080`), set up your Teleport CLI mapping:
-1. Click the **⚙️ Global Settings** button in the lower left navigation pane.
-2. Enter your `Teleport Proxy Host` (e.g., `teleport.host.com:443`) and your `Teleport Username` (e.g., `name@mail.com`).
-3. Click **Save Settings**.
+## Build
 
-### 3. Register Databases
-1. Click **+ Add New** to mount a new connection.
-2. Provide a friendly visual label, the registered internal database name, and the cluster's Teleport Instance routing mapping.
+```bash
+# Build the application bundle for your platform
+npm run tauri build
+```
 
-### 4. Initiate Tunneled Connection
-Select any registered database on your sidebar, specify an unused local port logic mapping (e.g. `6666`), and deploy! You will be securely prompted for your SSO password and OTP tokens straight from the UI popup. Keep the session logs spinning in the background.
+The compiled binary will be in `src-tauri/target/release/bundle/`.
 
----
+## Architecture
 
-## 👨‍💻 Contributing
-Feel free to open issues or send pull-requests as this is an evolving experiment to drastically simplify internal DevOps database procedures!
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Backend** | Rust + Tauri v2 | State management, PTY process execution, file I/O |
+| **Frontend** | Vite + Vanilla JS/CSS | UI with glassmorphic design system |
+| **PTY** | `portable-pty` | Interactive `tsh` sessions with password/OTP support |
+| **Storage** | JSON files | Database configs & global settings in app data dir |
 
-**License**: MIT 
+## Project Structure
+
+```
+teleport-ui/
+├── index.html              # Vite entry point
+├── src/
+│   ├── main.js             # Frontend logic
+│   ├── style.css           # Design system & styles
+│   └── favicon.svg         # App icon
+├── src-tauri/
+│   ├── src/
+│   │   ├── main.rs         # Tauri entry point
+│   │   ├── lib.rs          # App setup & plugin registration
+│   │   ├── commands.rs     # Tauri IPC commands
+│   │   ├── models.rs       # Data structures
+│   │   └── store.rs        # JSON file persistence
+│   ├── Cargo.toml          # Rust dependencies
+│   └── tauri.conf.json     # Tauri configuration
+├── vite.config.js          # Vite configuration
+└── package.json            # Node dependencies
+```
+
+## License
+
+Open sourced for [Stockbit](https://stockbit.com).
