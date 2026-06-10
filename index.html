@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleDB Proxy</title>
+    <meta name="description" content="Teleport Database Proxy UI — Connect to your databases securely via Teleport.">
+    <link rel="icon" type="image/svg+xml" href="/src/favicon.svg">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="sidebar glass-panel">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 12H2M22 12L16 6M22 12L16 18" />
+                                <circle cx="6" cy="12" r="2" />
+                            </svg>
+                        </div>
+                        <h1 class="logo-title">TeleDB Proxy</h1>
+                    </div>
+                    <button id="addDbBtn" class="btn btn-sm btn-outline" title="Add new database">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        Add
+                    </button>
+                </div>
+
+                <div class="db-list" id="dbList">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div class="sidebar-footer">
+                    <button id="settingsBtn" class="btn btn-block btn-ghost">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41" />
+                        </svg>
+                        Global Settings
+                    </button>
+                    <div class="version-badge">v2.0.0 · Luqi</div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div id="welcomeScreen" class="screen active">
+                    <div class="welcome-center">
+                        <div class="welcome-icon">
+                            <div class="pulse-ring"></div>
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                            </svg>
+                        </div>
+                        <h2>Select a Database</h2>
+                        <p>Choose an instance from the left sidebar or add a new database configuration to get started.
+                        </p>
+                        <button id="welcomeAddBtn" class="btn btn-primary btn-glow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Add Database
+                        </button>
+                    </div>
+                </div>
+
+                <div id="connectScreen" class="screen glass-panel">
+                    <div class="connect-header">
+                        <div>
+                            <h2 id="selectedDbTitle">Database Name</h2>
+                            <span class="badge" id="selectedDbInstance">instance</span>
+                        </div>
+                        <div class="connect-header-right">
+                            <div class="connect-timer" id="connectTimer" style="display:none;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                                <span id="timerDisplay">00:00</span>
+                            </div>
+                            <div class="connect-status" id="connectStatus">
+                                <span class="status-dot"></span>
+                                <span class="status-text">Idle</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="connectForm" class="connect-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="accessType">Access Type</label>
+                                <select id="accessType">
+                                    <option value="read">Read (telereader)</option>
+                                    <option value="write">Write (telewriter)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="provider">Provider</label>
+                                <select id="provider">
+                                    <option value="aws">AWS</option>
+                                    <option value="gcp">GCP</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label for="localPort">Local Port</label>
+                                <input type="number" id="localPort" value="6666" placeholder="6666">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-glow" id="startBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                                Launch Proxy
+                            </button>
+                            <button type="button" class="btn btn-danger hidden" id="stopBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                </svg>
+                                Disconnect
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="terminal-container">
+                        <div class="terminal-header">
+                            <div class="terminal-dots">
+                                <span class="dot dot-red"></span>
+                                <span class="dot dot-yellow"></span>
+                                <span class="dot dot-green"></span>
+                            </div>
+                            <span class="terminal-title">Logs &amp; Terminal</span>
+                        </div>
+
+                        <!-- Interactive Input Overlay -->
+                        <div class="terminal-input-overlay" id="inputOverlay">
+                            <div class="input-card glass-panel">
+                                <div class="input-card-icon">🔐</div>
+                                <h3 id="inputPromptLabel">Action Required</h3>
+                                <input type="password" id="terminalInput" autocomplete="off"
+                                    placeholder="Enter here...">
+                                <button class="btn btn-primary btn-glow" id="submitInputBtn">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add DB Modal -->
+    <div class="modal-backdrop" id="addDbModal">
+        <div class="modal glass-panel">
+            <div class="modal-header">
+                <h2>Add Database</h2>
+                <button class="btn-icon" id="closeModalBtn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <form id="addDbForm">
+                <div class="form-group">
+                    <label for="newLabel">Label</label>
+                    <input type="text" id="newLabel" placeholder="e.g. Prod Core DB" required>
+                </div>
+                <div class="form-group">
+                    <label for="newDbName">Database Name</label>
+                    <input type="text" id="newDbName" placeholder="e.g. sb-prod-db" required>
+                </div>
+                <div class="form-group">
+                    <label for="newDbInstance">Teleport Instance Name</label>
+                    <input type="text" id="newDbInstance" placeholder="e.g. sb-rds-cluster" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" id="closeModalBtn2">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Database</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-backdrop" id="settingsModal">
+        <div class="modal glass-panel">
+            <div class="modal-header">
+                <h2>Global Settings</h2>
+                <button class="btn-icon" id="closeSettingsBtn" aria-label="Close settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="teleportProxy">Teleport Proxy Host</label>
+                    <input type="text" id="teleportProxy" placeholder="e.g. teleport.example.com:443" required>
+                </div>
+                <div class="form-group">
+                    <label for="teleportUser">Teleport Username</label>
+                    <input type="email" id="teleportUser" placeholder="e.g. user@company.com" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" id="closeSettingsBtn2">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
