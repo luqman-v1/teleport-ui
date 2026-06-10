@@ -52,21 +52,30 @@ The compiled binary will be in `src-tauri/target/release/bundle/`.
 teleport-ui/
 ├── index.html              # Vite entry point
 ├── src/
-│   ├── main.js             # Frontend logic
+│   ├── main.js             # Frontend entry point
+│   ├── modules/            # UI modules (state, proxy, etc.)
 │   ├── style.css           # Design system & styles
 │   └── favicon.svg         # App icon
 ├── src-tauri/
-│   ├── src/
-│   │   ├── main.rs         # Tauri entry point
-│   │   ├── lib.rs          # App setup & plugin registration
-│   │   ├── commands.rs     # Tauri IPC commands
-│   │   ├── models.rs       # Data structures
-│   │   └── store.rs        # JSON file persistence
+│   ├── src/                # Rust backend source
 │   ├── Cargo.toml          # Rust dependencies
 │   └── tauri.conf.json     # Tauri configuration
-├── vite.config.js          # Vite configuration
 └── package.json            # Node dependencies
 ```
+
+## Troubleshooting
+
+### macOS: "TeleDB Proxy is damaged and can't be opened"
+If you download the application outside the Mac App Store and see an error saying the app is damaged and should be moved to the Trash, this is macOS **Gatekeeper** putting the app in quarantine because it is unsigned.
+
+**To fix this:**
+1. Move the `TeleDB Proxy.app` to your **Applications** folder.
+2. Open the **Terminal** app.
+3. Run the following command to remove the quarantine attribute:
+   ```bash
+   xattr -cr "/Applications/TeleDB Proxy.app"
+   ```
+4. Double-click the app to open it normally.
 
 ## License
 
