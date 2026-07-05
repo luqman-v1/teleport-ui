@@ -17,7 +17,7 @@ export function getOrCreateSession(db) {
         state.sessions[db.id] = {
             isRunning: false,
             terminalDiv: tDiv,
-            port: '6666',
+            port: db.port || '6666',
             unlisten: null,
             timerStart: null,
             timerInterval: null,

@@ -43,6 +43,7 @@ pub fn run() {
             commands::start_proxy,
             commands::stop_proxy,
             commands::send_input,
+            commands::tsh_logout,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

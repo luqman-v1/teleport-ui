@@ -39,6 +39,10 @@
                     </button>
                 </div>
 
+                <div class="db-tabs" id="dbTabs">
+                    <!-- Populated by renderDatabases -->
+                </div>
+
                 <div class="db-list" id="dbList">
                     <!-- Dynamically populated -->
                 </div>
@@ -53,7 +57,16 @@
                         </svg>
                         Global Settings
                     </button>
-                    <div class="version-badge">v2.0.0 · Luqi</div>
+                    <button id="logoutBtn" class="btn btn-block btn-ghost btn-logout">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Logout (tsh)
+                    </button>
+                    <div class="version-badge">v2.1.0 · Luqi</div>
                 </div>
             </aside>
 
@@ -174,7 +187,7 @@
     <div class="modal-backdrop" id="addDbModal">
         <div class="modal glass-panel">
             <div class="modal-header">
-                <h2>Add Database</h2>
+                <h2 id="addModalTitle">Add Database</h2>
                 <button class="btn-icon" id="closeModalBtn" aria-label="Close modal">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18" />
@@ -195,9 +208,17 @@
                     <label for="newDbInstance">Teleport Instance Name</label>
                     <input type="text" id="newDbInstance" placeholder="e.g. sb-rds-cluster" required>
                 </div>
+                <div class="form-group">
+                    <label for="newPort">Local Port <span class="optional">(optional)</span></label>
+                    <input type="number" id="newPort" placeholder="Default: 6666" min="1024" max="65535">
+                </div>
+                <div class="form-group">
+                    <label for="newGroup">Group <span class="optional">(optional)</span></label>
+                    <input type="text" id="newGroup" placeholder="e.g. Production, Staging, Redis">
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-ghost" id="closeModalBtn2">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Database</button>
+                    <button type="submit" class="btn btn-primary" id="addModalSaveBtn">Save Database</button>
                 </div>
             </form>
         </div>

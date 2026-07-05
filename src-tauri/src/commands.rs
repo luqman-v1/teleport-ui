@@ -52,6 +52,29 @@ pub fn save_config(config: GlobalConfig, store: State<'_, Arc<DataStore>>) -> Re
     store.save_config(config)
 }
 
+#[tauri::command]
+pub fn tsh_logout() -> Result<(), String> {
+    let path_env = match std::env::var("PATH") {
+        Ok(p) => format!("{}:/usr/local/bin:/opt/homebrew/bin", p),
+        Err(_) => "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/homebrew/bin".to_string(),
+    };
+
+    let output = std::process::Command::new("sh")
+        .args(["-c", "tsh logout"])
+        .env("PATH", path_env)
+        .output()
+        .map_err(|e| format!("Failed to run tsh logout: {}", e))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let msg = if stderr.trim().is_empty() { stdout.trim() } else { stderr.trim() };
+        return Err(format!("tsh logout failed: {}", msg));
+    }
+
+    Ok(())
+}
+
 // ===== PROXY COMMANDS =====
 
 #[tauri::command]

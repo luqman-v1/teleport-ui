@@ -98,6 +98,14 @@ async function startProxySession(db, accessType, provider, port) {
             }
         })
         showToast(`Proxy started for ${db.label}`, 'success')
+
+        // Save port for persistence
+        db.port = port
+        try {
+            await invoke('save_database', { db })
+        } catch (saveErr) {
+            console.error('Failed to save port:', saveErr)
+        }
     } catch (err) {
         appendTerminal(sess, `<span class="terminal-line-error">Error: ${escapeHtml(String(err))}\n</span>`)
         sess.isRunning = false

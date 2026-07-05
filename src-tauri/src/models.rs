@@ -6,6 +6,10 @@ pub struct Database {
     pub label: String,
     pub db_name: String,
     pub db_instance: String,
+    #[serde(default)]
+    pub port: String,
+    #[serde(default)]
+    pub group: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

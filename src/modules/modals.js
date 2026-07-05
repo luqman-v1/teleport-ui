@@ -1,16 +1,41 @@
 import { invoke } from '@tauri-apps/api/core'
 import { showToast } from './utils.js'
 import { loadDatabases } from './database.js'
+import { state } from './state.js'
+
+// Module-level state for add/edit modal
+let addModal = null
+
+function closeAddModal() {
+    if (!addModal) return
+    addModal.classList.remove('active')
+    document.getElementById('addDbForm').reset()
+    state.editingDbId = null
+}
+
+export function openEditModal(db) {
+    state.editingDbId = db.id
+    document.getElementById('addModalTitle').textContent = 'Edit Database'
+    document.getElementById('addModalSaveBtn').textContent = 'Update Database'
+    document.getElementById('newLabel').value = db.label || ''
+    document.getElementById('newDbName').value = db.db_name || ''
+    document.getElementById('newDbInstance').value = db.db_instance || ''
+    document.getElementById('newPort').value = db.port || ''
+    document.getElementById('newGroup').value = db.group || ''
+    addModal.classList.add('active')
+}
 
 export function setupModals() {
-    const addModal = document.getElementById('addDbModal')
+    addModal = document.getElementById('addDbModal')
     const settingsModal = document.getElementById('settingsModal')
 
-    // Add DB Modal
-    function openAddModal() { addModal.classList.add('active') }
-    function closeAddModal() {
-        addModal.classList.remove('active')
+    // Add/Edit DB Modal
+    function openAddModal() {
+        state.editingDbId = null
+        document.getElementById('addModalTitle').textContent = 'Add Database'
+        document.getElementById('addModalSaveBtn').textContent = 'Save Database'
         document.getElementById('addDbForm').reset()
+        addModal.classList.add('active')
     }
 
     document.getElementById('addDbBtn').addEventListener('click', openAddModal)
@@ -24,21 +49,73 @@ export function setupModals() {
 
     document.getElementById('addDbForm').addEventListener('submit', async (e) => {
         e.preventDefault()
-        const newDb = {
-            id: String(Date.now()),
-            label: document.getElementById('newLabel').value.trim(),
-            db_name: document.getElementById('newDbName').value.trim(),
-            db_instance: document.getElementById('newDbInstance').value.trim(),
-        }
 
-        try {
-            await invoke('save_database', { db: newDb })
-            closeAddModal()
-            await loadDatabases()
-            showToast(`Added "${newDb.label}"`, 'success')
-        } catch (err) {
-            console.error('Save DB failed:', err)
-            showToast('Failed to save database', 'error')
+        if (state.editingDbId) {
+            // Edit mode
+            const updatedDb = {
+                id: state.editingDbId,
+                label: document.getElementById('newLabel').value.trim(),
+                db_name: document.getElementById('newDbName').value.trim(),
+                db_instance: document.getElementById('newDbInstance').value.trim(),
+                port: document.getElementById('newPort').value.trim(),
+                group: document.getElementById('newGroup').value.trim(),
+            }
+
+            // Stop proxy if running
+            if (state.sessions[state.editingDbId]?.isRunning) {
+                try {
+                    await invoke('stop_proxy', { dbId: state.editingDbId })
+                } catch (_) {}
+            }
+
+            try {
+                await invoke('save_database', { db: updatedDb })
+                closeAddModal()
+                await loadDatabases()
+
+                // Update connect screen fields if editing currently selected DB
+                if (state.currentDb?.id === updatedDb.id) {
+                    state.currentDb.label = updatedDb.label
+                    state.currentDb.db_name = updatedDb.db_name
+                    state.currentDb.db_instance = updatedDb.db_instance
+                    state.currentDb.port = updatedDb.port
+                    state.currentDb.group = updatedDb.group
+
+                    document.getElementById('selectedDbTitle').textContent = updatedDb.label
+                    document.getElementById('selectedDbInstance').textContent = updatedDb.db_instance
+
+                    const sess = state.sessions[updatedDb.id]
+                    if (sess) {
+                        sess.port = updatedDb.port || '6666'
+                        document.getElementById('localPort').value = sess.port
+                    }
+                }
+
+                showToast(`Updated "${updatedDb.label}"`, 'success')
+            } catch (err) {
+                console.error('Update DB failed:', err)
+                showToast('Failed to update database', 'error')
+            }
+        } else {
+            // Add mode
+            const newDb = {
+                id: String(Date.now()),
+                label: document.getElementById('newLabel').value.trim(),
+                db_name: document.getElementById('newDbName').value.trim(),
+                db_instance: document.getElementById('newDbInstance').value.trim(),
+                port: document.getElementById('newPort').value.trim(),
+                group: document.getElementById('newGroup').value.trim(),
+            }
+
+            try {
+                await invoke('save_database', { db: newDb })
+                closeAddModal()
+                await loadDatabases()
+                showToast(`Added "${newDb.label}"`, 'success')
+            } catch (err) {
+                console.error('Save DB failed:', err)
+                showToast('Failed to save database', 'error')
+            }
         }
     })
 
