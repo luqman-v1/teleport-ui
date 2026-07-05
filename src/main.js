@@ -3,6 +3,7 @@ import { setupProxyListeners } from './modules/proxy.js'
 import { setupModals, closeModals } from './modules/modals.js'
 import { setupTerminalInput, closeTerminalInput } from './modules/terminal.js'
 import { invoke } from '@tauri-apps/api/core'
+import { getVersion } from '@tauri-apps/api/app'
 import { showToast } from './modules/utils.js'
 
 // Logout handler
@@ -32,3 +33,9 @@ document.addEventListener('keydown', (e) => {
 
 // Initial Data Load
 loadDatabases()
+
+// Set version badge from app metadata
+getVersion().then(v => {
+    const badge = document.getElementById('versionBadge')
+    if (badge) badge.textContent = `v${v} · Luqi`
+})
