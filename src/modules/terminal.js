@@ -21,7 +21,8 @@ export function getOrCreateSession(db) {
             unlisten: null,
             timerStart: null,
             timerInterval: null,
-            streamBuffer: ''
+            streamBuffer: '',
+            sessionGen: 0,
         }
     }
     return state.sessions[db.id]

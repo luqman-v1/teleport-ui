@@ -50,10 +50,13 @@ async function startProxySession(db, accessType, provider, port) {
     }
 
     // Listen for output events from Rust backend
+    const thisGen = sess.sessionGen
     sess.unlisten = await listen(`proxy-output-${db.id}`, (event) => {
         const { text, event_type } = event.payload
 
         if (event_type === 'closed') {
+            // Stale event from a previously killed session — ignore
+            if (sess.sessionGen !== thisGen) return
             sess.isRunning = false
             stopTimer(sess)
             updateConnectionUI(false)
@@ -68,6 +71,7 @@ async function startProxySession(db, accessType, provider, port) {
         }
 
         if (event_type === 'error') {
+            if (sess.sessionGen !== thisGen) return
             appendTerminal(sess, `<span class="terminal-line-error">${escapeHtml(text)}</span>`)
             return
         }

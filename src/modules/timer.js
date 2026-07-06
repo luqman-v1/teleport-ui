@@ -1,4 +1,11 @@
 export function startTimer(sess) {
+    // Clear any leaked interval from prior session
+    if (sess.timerInterval) {
+        clearInterval(sess.timerInterval)
+    }
+    // Bump session gen — stale closed events check this
+    sess.sessionGen = (sess.sessionGen || 0) + 1
+
     sess.timerStart = Date.now()
     sess.timerInterval = setInterval(() => {
         if (!sess.timerStart) return
