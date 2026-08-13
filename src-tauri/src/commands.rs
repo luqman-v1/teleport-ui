@@ -4,7 +4,7 @@ use portable_pty::{native_pty_system, CommandBuilder, PtySize};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Emitter, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 // ===== STATE for active PTY sessions =====
 pub struct PtySessions {
@@ -289,6 +289,27 @@ pub fn send_input(
     }
     Ok(())
 }
+
+// ===== DOCK & ATTENTION COMMANDS =====
+
+#[tauri::command]
+pub fn set_dock_badge(app_handle: tauri::AppHandle, count: Option<i64>) -> Result<(), String> {
+    for (_, window) in app_handle.webview_windows() {
+        let _ = window.set_badge_count(count);
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn request_user_attention(window: tauri::WebviewWindow, critical: bool) -> Result<(), String> {
+    let attention_type = if critical {
+        Some(tauri::UserAttentionType::Critical)
+    } else {
+        None
+    };
+    window.request_user_attention(attention_type).map_err(|e| e.to_string())
+}
+
 
 // ===== ANSI STRIP HELPER =====
 fn strip_ansi(bytes: &[u8]) -> String {

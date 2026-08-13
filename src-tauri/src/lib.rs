@@ -44,6 +44,8 @@ pub fn run() {
             commands::stop_proxy,
             commands::send_input,
             commands::tsh_logout,
+            commands::set_dock_badge,
+            commands::request_user_attention,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
