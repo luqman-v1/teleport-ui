@@ -5,6 +5,7 @@ import { escapeHtml, showToast } from './utils.js'
 import { getOrCreateSession, appendTerminal, showInputModal } from './terminal.js'
 import { startTimer, stopTimer } from './timer.js'
 import { renderDatabases, updateConnectionUI, updateStatusBadge } from './database.js'
+import { notifyAuthRequired, clearAuthRequired } from './notifications.js'
 
 export function setupProxyListeners() {
     document.getElementById('connectForm').addEventListener('submit', async (e) => {
@@ -63,6 +64,7 @@ async function startProxySession(db, accessType, provider, port) {
             updateStatusBadge(false)
             renderDatabases()
             appendTerminal(sess, `\n<span class="terminal-line-info">=> [Connection Closed]\n</span>`)
+            clearAuthRequired(db.id)
             if (sess.unlisten) {
                 sess.unlisten()
                 sess.unlisten = null
@@ -73,6 +75,7 @@ async function startProxySession(db, accessType, provider, port) {
         if (event_type === 'error') {
             if (sess.sessionGen !== thisGen) return
             appendTerminal(sess, `<span class="terminal-line-error">${escapeHtml(text)}</span>`)
+            clearAuthRequired(db.id)
             return
         }
 
@@ -83,9 +86,11 @@ async function startProxySession(db, accessType, provider, port) {
         const lower = sess.streamBuffer.toLowerCase()
 
         if (lower.includes('password:') || lower.includes('enter password')) {
+            notifyAuthRequired(db.id)
             showInputModal(`🔑 Password for ${db.label}`, 'password', sess)
             sess.streamBuffer = ''
         } else if (lower.includes('otp') || lower.includes('token:') || lower.includes('authenticator') || lower.includes('mfa') || lower.includes('security key')) {
+            notifyAuthRequired(db.id)
             showInputModal(`📱 OTP for ${db.label}`, 'text', sess)
             sess.streamBuffer = ''
         }
@@ -117,5 +122,6 @@ async function startProxySession(db, accessType, provider, port) {
         updateConnectionUI(false)
         updateStatusBadge(false)
         showToast(`Failed to start proxy: ${err}`, 'error')
+        clearAuthRequired(db.id)
     }
 }

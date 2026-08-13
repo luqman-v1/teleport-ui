@@ -1,6 +1,7 @@
 import { state } from './state.js'
 import { escapeHtml, showToast } from './utils.js'
 import { invoke } from '@tauri-apps/api/core'
+import { clearAuthRequired } from './notifications.js'
 
 export function getOrCreateSession(db) {
     if (!state.sessions[db.id]) {
@@ -15,6 +16,7 @@ export function getOrCreateSession(db) {
         }
 
         state.sessions[db.id] = {
+            dbId: db.id,
             isRunning: false,
             terminalDiv: tDiv,
             port: db.port || '6666',
@@ -67,6 +69,9 @@ export function showInputModal(title, type = 'password', sess) {
 
         const echo = type === 'password' ? '●●●●●●●●\n' : escapeHtml(val) + '\n'
         appendTerminal(sess, `<span class="terminal-line-warn">${echo}</span>`)
+        if (sess && sess.dbId) {
+            clearAuthRequired(sess.dbId)
+        }
         submitAction = null
     }
 }

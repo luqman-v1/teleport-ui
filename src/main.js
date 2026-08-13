@@ -2,6 +2,7 @@ import { loadDatabases } from './modules/database.js'
 import { setupProxyListeners } from './modules/proxy.js'
 import { setupModals, closeModals } from './modules/modals.js'
 import { setupTerminalInput, closeTerminalInput } from './modules/terminal.js'
+import { setupNotificationListeners } from './modules/notifications.js'
 import { invoke } from '@tauri-apps/api/core'
 import { getVersion } from '@tauri-apps/api/app'
 import { showToast } from './modules/utils.js'
@@ -20,6 +21,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 setupProxyListeners()
 setupModals()
 setupTerminalInput()
+setupNotificationListeners()
 
 // Global Keyboard Shortcuts
 document.addEventListener('keydown', (e) => {
